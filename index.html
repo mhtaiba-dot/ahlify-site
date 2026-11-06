@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ahlify</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ahlify is a WhatsApp AI assistant that answers parents' admissions and fee questions in Arabic and English, day and night.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Readex+Pro:wght@300;400;500;600&family=Reem+Kufi:wght@600;700&display=swap">
+<style>
+/* Layout: a split hero where the welcome greeting sits beside a live-looking WhatsApp thread; quiet bands below. */
+:root {
+  --bg: #f2f5f3;
+  --surface: #ffffff;
+  --ink: #12261f;
+  --muted: #55665f;
+  --line: #d8e1dc;
+  --accent: #1f7a57;
+  --accent-ink: #ffffff;
+  --saffron: #d9952b;
+  --bubble-in: #ffffff;
+  --bubble-out: #d8f1e2;
+  --chat-bg: #e6ece8;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-arabic: "Reem Kufi", "Readex Pro", "Geeza Pro", "Segoe UI", sans-serif;
+  --font-body: "Readex Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1713; --surface: #14211c; --ink: #e6efe9; --muted: #9db0a7; --line: #24362e;
+    --accent: #3bb07f; --accent-ink: #06140e; --saffron: #e9b04f;
+    --bubble-in: #1b2b24; --bubble-out: #1f4a37; --chat-bg: #101c17; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1713; --surface: #14211c; --ink: #e6efe9; --muted: #9db0a7; --line: #24362e;
+  --accent: #3bb07f; --accent-ink: #06140e; --saffron: #e9b04f;
+  --bubble-in: #1b2b24; --bubble-out: #1f4a37; --chat-bg: #101c17; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.6; font-weight: 400;
+}
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--saffron); outline-offset: 3px; border-radius: 6px; }
+
+/* Header */
+.top { padding-block: 22px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; }
+.brand span { font-family: var(--font-arabic); color: var(--accent); font-size: 1.15rem; }
+.top nav { display: flex; gap: 20px; font-size: 0.95rem; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+
+/* Hero */
+.hero { padding-block: 28px 64px; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+.hero-copy { min-width: 0; }
+.greet {
+  font-family: var(--font-arabic); font-weight: 700; color: var(--accent);
+  font-size: clamp(4rem, 11vw, 7.5rem); line-height: 1; margin: 0 0 6px; direction: rtl; text-align: left;
+}
+h1 {
+  font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em;
+  font-size: clamp(2.1rem, 4.6vw, 3.4rem); line-height: 1.05; margin: 0 0 20px; text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 36em; margin: 0 0 28px; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 999px;
+  font: 500 1rem var(--font-body); text-decoration: none; cursor: pointer; border: 1px solid transparent;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--accent); }
+.langs { margin-top: 22px; font-size: 0.9rem; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; background: var(--surface); }
+
+/* Phone thread */
+.phone {
+  background: var(--chat-bg); border-radius: 28px; border: 1px solid var(--line);
+  padding: 0 0 18px; max-width: 400px; width: 100%; justify-self: end; overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(18, 38, 31, 0.35);
+}
+.phone-head { background: var(--accent); color: var(--accent-ink); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-ink); color: var(--accent); display: grid; place-items: center; font-family: var(--font-arabic); font-weight: 700; }
+.phone-head strong { display: block; font-weight: 600; font-size: 0.98rem; }
+.phone-head small { opacity: 0.85; font-size: 0.8rem; }
+.thread { display: flex; flex-direction: column; gap: 10px; padding: 16px 14px 0; }
+.example { align-self: center; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface); padding: 3px 10px; border-radius: 6px; }
+.msg { max-width: 84%; padding: 9px 12px 18px; border-radius: 12px; font-size: 0.93rem; line-height: 1.45; position: relative; min-width: 0; }
+.msg time { position: absolute; right: 10px; bottom: 4px; font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.in { background: var(--bubble-in); align-self: flex-start; border-top-left-radius: 3px; }
+.out { background: var(--bubble-out); align-self: flex-end; border-top-right-radius: 3px; }
+.ar { direction: rtl; text-align: right; font-family: var(--font-body); }
+.fee { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px; margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
+.fee span:nth-child(even) { text-align: left; font-weight: 500; }
+.quick { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.quick span { font-size: 0.8rem; border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 3px 10px; background: var(--surface); }
+.msg { opacity: 1; animation: rise 0.5s ease both; }
+.thread .msg:nth-of-type(2) { animation-delay: 0.15s; }
+.thread .msg:nth-of-type(3) { animation-delay: 0.3s; }
+.thread .msg:nth-of-type(4) { animation-delay: 0.45s; }
+@keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .msg { animation: none; } }
+
+/* Sections */
+section.band { padding-block: 72px; border-top: 1px solid var(--line); }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; font-weight: 500; }
+h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.1; margin: 0 0 16px; text-wrap: balance; max-width: 22em; }
+.section-lede { color: var(--muted); max-width: 40em; margin: 0 0 40px; font-size: 1.05rem; }
+
+.answers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.answers div { background: var(--surface); padding: 26px 24px; min-width: 0; }
+.answers h3 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+.answers p { margin: 0; color: var(--muted); font-size: 0.97rem; }
+.answers .q { font-size: 0.88rem; color: var(--accent); margin-bottom: 12px; display: block; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; counter-reset: step; }
+.steps li { counter-increment: step; min-width: 0; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-family: var(--font-display); font-weight: 700; margin-bottom: 16px; }
+.steps h3 { font-family: var(--font-display); font-size: 1.2rem; margin: 0 0 6px; font-weight: 700; }
+.steps p { margin: 0; color: var(--muted); }
+
+.sectors { display: flex; flex-wrap: wrap; gap: 12px; }
+.sector { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; }
+.sector strong { font-weight: 600; }
+.tag { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; }
+.tag.live { background: var(--accent); color: var(--accent-ink); }
+.tag.soon { border: 1px solid var(--saffron); color: var(--saffron); }
+
+.contact { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 40px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; }
+.contact > div { min-width: 0; }
+.mail { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.mail code { font-family: var(--font-body); font-size: 1.25rem; font-weight: 500; color: var(--ink); user-select: all; word-break: break-all; }
+.copied { font-size: 0.85rem; color: var(--accent); }
+
+footer { padding-block: 36px 48px; color: var(--muted); font-size: 0.9rem; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 860px) {
+  .hero .wrap, .contact { grid-template-columns: 1fr; }
+  .phone { justify-self: start; }
+  .answers, .steps { grid-template-columns: 1fr; }
+  .top nav { display: none; }
+  .contact { padding: 28px 22px; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Ahlify home"><b>Ahlify</b><span>أهلاً</span></a>
+    <nav aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#sectors">Who it's for</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="greet" lang="ar">أهلاً</p>
+        <h1>Every parent's question, <em>answered on WhatsApp.</em></h1>
+        <p class="lede">Ahlify is an AI assistant for international schools. It answers admissions, fees and enrolment questions in Arabic and English, at any hour, and passes serious enquiries straight to your admissions team.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#contact">Book a demo</a>
+          <a class="btn btn-ghost" href="#how">See how it works</a>
+        </div>
+        <div class="langs" aria-label="Languages">
+          <span class="chip">العربية</span><span class="chip">English</span><span class="chip">Replies 24/7</span>
+        </div>
+      </div>
+
+      <div class="phone" role="img" aria-label="Example WhatsApp conversation between a parent and a school's Ahlify assistant">
+        <div class="phone-head">
+          <div class="avatar" aria-hidden="true">أ</div>
+          <div><strong>Admissions · Your School</strong><small>Answered by Ahlify</small></div>
+        </div>
+        <div class="thread">
+          <span class="example">Example conversation</span>
+          <div class="msg in ar" lang="ar">السلام عليكم، كم رسوم الصف السابع للسنة الجاية؟ وهل فيه مقاعد؟<time>21:47</time></div>
+          <div class="msg out ar" lang="ar">وعليكم السلام، أهلاً بك! رسوم الصف السابع للعام الدراسي القادم:
+            <div class="fee"><span>الرسوم الدراسية</span><span>٤٨٬٠٠٠ ر.س</span><span>رسوم التسجيل</span><span>٢٬٥٠٠ ر.س</span></div>
+            المقاعد متاحة حالياً. تحب أحجز لك زيارة للمدرسة؟<time>21:47</time></div>
+          <div class="msg in ar" lang="ar">إيه، يوم الأحد الصبح لو أمكن<time>21:48</time></div>
+          <div class="msg out ar" lang="ar">تم ✓ الأحد ٩:٣٠ صباحاً. أرسلت التفاصيل لفريق القبول وبيتواصلون معك للتأكيد.
+            <div class="quick"><span>الموقع</span><span>المستندات المطلوبة</span></div><time>21:48</time></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="answers">
+    <div class="wrap">
+      <p class="eyebrow">What it handles</p>
+      <h2>The questions your admissions office answers every day</h2>
+      <p class="section-lede">Ahlify learns from your own fee schedule, policies and FAQs, so every reply matches what your school actually offers.</p>
+      <div class="answers">
+        <div><span class="q">"How much is Year 7?"</span><h3>Fees and payment plans</h3><p>Tuition, registration and bus fees by grade, in SAR, with your instalment options.</p></div>
+        <div><span class="q">"Do you have seats for September?"</span><h3>Admissions and tours</h3><p>Availability, required documents and entrance assessments, with tour bookings sent to your team.</p></div>
+        <div><span class="q">"Which curriculum do you follow?"</span><h3>Everyday parent questions</h3><p>Curriculum, term dates, uniforms, transport and school hours, answered instantly.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2>Live on your WhatsApp number in three steps</h2>
+      <p class="section-lede">No new app for parents. They message the number they already use, and Ahlify replies.</p>
+      <ol class="steps">
+        <li><h3>Share your information</h3><p>Send us your fee schedule, admissions policy and common questions. We set up the assistant around them.</p></li>
+        <li><h3>Connect WhatsApp Business</h3><p>We link Ahlify to your school's WhatsApp Business number through Meta's official platform.</p></li>
+        <li><h3>Your team stays in control</h3><p>Ahlify answers routine questions and hands serious enquiries and tour requests to your admissions staff.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="sectors">
+    <div class="wrap">
+      <p class="eyebrow">Who it's for</p>
+      <h2>Built for Gulf businesses that live on WhatsApp</h2>
+      <p class="section-lede">We're starting with international schools in Saudi Arabia, then extending the same assistant to other sectors where every enquiry counts.</p>
+      <div class="sectors">
+        <div class="sector"><strong>International schools</strong><span class="tag live">Available now</span></div>
+        <div class="sector"><strong>Estate agents</strong><span class="tag soon">Coming soon</span></div>
+        <div class="sector"><strong>Clinics</strong><span class="tag soon">Coming soon</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="contact">
+    <div class="wrap">
+      <div class="contact">
+        <div>
+          <p class="eyebrow">Book a demo</p>
+          <h2>See Ahlify answer your school's questions</h2>
+          <p class="section-lede" style="margin-bottom:0">Email us and we'll set up a short demo using your own fees and FAQs.</p>
+        </div>
+        <div>
+          <div class="mail">
+            <code id="email">info@ahlify.com</code>
+            <button class="btn btn-ghost" id="copy-email" type="button">Copy</button>
+            <span class="copied" id="copied" hidden>Copied</span>
+          </div>
+          <p style="margin:18px 0 0"><a class="btn btn-primary" href="mailto:info@ahlify.com?subject=Ahlify%20demo">Email us</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Ahlify · Riyadh, Saudi Arabia</span>
+    <span>info@ahlify.com</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('copy-email').addEventListener('click', function () {
+  var text = 'info@ahlify.com';
+  var done = function () { var c = document.getElementById('copied'); c.hidden = false; setTimeout(function () { c.hidden = true; }, 1800); };
+  var fallback = function () { var r = document.createRange(); r.selectNodeContents(document.getElementById('email')); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); };
+  try {
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } catch (e) { fallback(); }
+});
+</script>
+</body>
+</html>
